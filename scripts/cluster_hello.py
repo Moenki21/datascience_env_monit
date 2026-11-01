@@ -2,7 +2,7 @@
 import math, os, random, socket, sys
 
 n_boot = int(sys.argv[1]) if len(sys.argv) > 1 else 5000
-
+# my name is niklas
 random.seed(42)
 gpp = [4 + 3 * math.sin(2 * math.pi * d / 365 - 1.5)
        + random.gauss(0, 0.5) for d in range(730)]
