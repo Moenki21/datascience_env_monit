@@ -1,0 +1,28 @@
+_niklas@fedora:~/GitHub_Repos/Monitoring$ cat out_file.txt
+[fr_nm381@uc3n990 scripts]$ python3 cluster_hello.py
+Host: uc3n990.localdomain
+Job ID: none
+Resamples: 5000
+Mean daily GPP: 4.01 (95% CI 3.84 to 4.17)
+_niklas@fedora:~/GitHub_Repos/Monitoring$ cat docs/STORAGE.md
+# Storage and backup (copy this file to STORAGE.md and fill it in)
+
+## Where things live
+- Code: GitHub (moenki21/datascience_env_monit),
+  my laptop, cluster HOME
+- Results: cluster workspace `envmon`, path: /pfs/work9/workspace/scratch/fr_nm381-envmon
+
+
+## Expiry
+- Workspace `envmon` expires on: Fri Jan  1 00:00:08 2027
+- I extend it on: Tue, Dec 31. Calendar reminder set: no
+
+## Backup
+- Code: GitHub is the second copy
+- Results I must keep: copied to my laptop on 11/2/26
+- Raw data: original download source + <university storage>
+_niklas@fedora:~/GitHub_Repos/Monitoring$ git remote -v
+origin  https://github.com/Moenki21/datascience_env_monit.git (fetch)
+origin  https://github.com/Moenki21/datascience_env_monit.git (push)
+upstream        https://github.com/negin-katal/datascience_env_monit.git (fetch)
+upstream        https://github.com/negin-katal/datascience_env_monit.git (push)
