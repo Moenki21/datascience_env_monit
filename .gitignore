@@ -3,4 +3,6 @@
 *.out
 *.zip
 .env
+.venv/
 */data*
+data/
