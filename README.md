@@ -27,8 +27,11 @@ With the virtual environment active and all five ZIP files in place, run this fr
 root:
 
 ```bash
-quarto render scripts/view_tower_data.ipynb
+quarto render scripts/view_tower_data.ipynb --execute --no-cache
 ```
+
+`--execute` runs the notebook cells before rendering, and `--no-cache` forces a fresh execution
+instead of reusing cached results.
 
 The rendered report is `scripts/view_tower_data.html`. On Windows PowerShell, activate the virtual
 environment with `.venv\Scripts\Activate.ps1` instead of the `source` command above.
