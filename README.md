@@ -146,6 +146,22 @@ For a conflict in any other file: open it, decide which lines to keep, delete th
 
 **On github.com** you can also click **Sync fork → Update branch** on your fork's page, then run `git pull` on your laptop. If GitHub offers **Discard commits**, do not click it: that throws away your own work. Use the command line instead.
 
+## My Block 5 report
+
+The Block 5 assignment (question 4, *Normal or not?*) is in [`reports/block5_question.qmd`](reports/block5_question.qmd); the analysis notebook that produces its inputs is [`scripts/block5/10_anomaly_analysis.ipynb`](scripts/block5/10_anomaly_analysis.ipynb).
+
+The report reads `data/processed/block5_anomalies.csv` and the raw FLUXNET zips, so from a fresh clone run the pipeline first (all commands from the project root, Python route):
+
+```bash
+python3 scripts/block5/02_worldclim.py --student 18   # WorldClim 2.1 normals
+python3 scripts/block5/04_soilgrids.py --student 18   # SoilGrids 2.0 soil properties
+python3 scripts/block5/09_merge.py     --student 18   # -> data/processed/site_{static,daily}.csv
+jupyter nbconvert --to notebook --execute --inplace scripts/block5/10_anomaly_analysis.ipynb
+quarto render reports/block5_question.qmd              # -> reports/block5_question.html
+```
+
+`02_worldclim.py` and `04_soilgrids.py` need internet access; `09_merge.py` and the notebook need the FLUXNET zips in `data/raw/` (Block 4). Nothing under `data/` is in Git.
+
 ## Your data
 
 - **Data never go into Git.** Add `data/` to your `.gitignore` (Block 4, Part A2). Git is for code and reports; data come from their original source, which your scripts and your report document.

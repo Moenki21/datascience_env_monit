@@ -28,18 +28,18 @@ static = df.groupby("site_id").agg(
 
 **Question:** Are the years observed at five FLUXNET towers climatologically "normal" — i.e., how far do tower-year mean temperature and total precipitation deviate from the 1970–2000 WorldClim normals at the tower locations?
 
-**Hypothesis:** Tower-years are on average **warmer** than the 1970–2000 normal (because the observation years 2000–2026 lie after the normal period, during which climate warmed), and the **driest** towers (low WorldClim BIO12) show the **largest relative precipitation anomalies**, because in dry climates a given absolute precipitation change translates into a larger relative anomaly and interannual variability is higher.
+**Hypothesis:** Tower-years are on average **warmer** than the 1970–2000 normal (because the observation years 2001–2025 lie after the normal period, during which climate warmed), and the **driest** towers (low WorldClim BIO12) show the **largest relative precipitation anomalies**, because in dry climates a given absolute precipitation change translates into a larger relative anomaly and interannual variability is higher.
 
-**Why these five towers are a reasonable test:** the set spans a wide climatic gradient — tropical savanna (AU-Dry, BIO1 ≈ 27 °C), alpine meadow (CN-HaM, BIO1 ≈ −0.7 °C), temperate sites (CA-Ca2, FR-Hes) and an irrigated Mediterranean-agricultural site (US-Bi1) — with annual precipitation from ~400 to ~1600 mm. That spread is what the second part of the hypothesis (dry towers → larger relative anomalies) needs. It is a small, non-random sample (n = 5 towers), so the test is descriptive rather than inferential.
+**Why these five towers are a reasonable test:** the set spans a wide climatic gradient — tropical savanna (AU-Dry, BIO1 ≈ 27 °C), alpine meadow (CN-HaM, BIO1 ≈ −0.7 °C), temperate sites (CA-Ca2, FR-Hes) and an irrigated Mediterranean-agricultural site (US-Bi1) — with annual precipitation from \~400 to \~1600 mm. That spread is what the second part of the hypothesis (dry towers → larger relative anomalies) needs. It is a small, non-random sample (n = 5 towers), so the test is descriptive rather than inferential.
 
 ## E2. Data
 
 ### Provenance table
 
 | Dataset | Variables used | Spatial resolution | Time resolution and period | Downloaded on | Script and changes | Citation |
-| --- | --- | --- | --- | --- | --- | --- |
-| FLUXNET (shuttle snapshot) | `TA_F`, `TA_F_QC`, `P_F`, `P_F_QC`, `P_ERA` (daily) | point (tower footprint ~100 m–1 km) | daily, 2000–2026 (site-specific) | 2026-11-13 (snapshot provided with the course) | `scripts/block5/09_merge.py` (provided; no changes) | Pastorello et al. (2020); site citations in E6 |
-| WorldClim 2.1 | BIO1 (mean annual temp.), BIO12 (annual precip.), monthly tavg/prec normals | 5′ grid cells (~9 km at the equator) | monthly normals, 1970–2000 | 2026-11-25 | `scripts/block5/02_worldclim.py` (provided; no changes) | Fick & Hijmans (2017) |
+|-----------|-----------|-----------|-----------|-----------|-----------|-----------|
+| FLUXNET (shuttle snapshot) | `TA_F`, `TA_F_QC`, `P_F`, `P_F_QC`, `P_ERA` (daily) | point (tower footprint \~100 m–1 km) | daily, 1997–2026 (site-specific) | 2026-11-13 (snapshot provided with the course) | `scripts/block5/09_merge.py` (provided; no changes) | Pastorello et al. (2020); site citations in E6 |
+| WorldClim 2.1 | BIO1 (mean annual temp.), BIO12 (annual precip.), monthly tavg/prec normals | 5′ grid cells (\~9 km at the equator) | monthly normals, 1970–2000 | 2026-11-25 | `scripts/block5/02_worldclim.py` (provided; no changes) | Fick & Hijmans (2017) |
 | SoilGrids 2.0 | clay, sand (0–30 cm mean) | 250 m grid cells | static (2017 snapshot of 1950–2017 data) | 2026-11-25 | `scripts/block5/04_soilgrids.py` (provided; no changes) | Poggio et al. (2021) |
 
 ### The two datasets at the five towers
@@ -51,27 +51,50 @@ WorldClim BIO1/BIO12 and SoilGrids clay/sand (0–30 cm) per tower, together wit
 static.round(1)
 ```
 
-![The two complementary datasets at the five towers: WorldClim BIO1 (mean annual temperature), BIO12 (annual precipitation) and SoilGrids clay content 0–30 cm. Note the broken CN-HaM precipitation in the FLUXNET product (~3 000 mm) vs. the WorldClim normal (468 mm) — see section E3.](../outputs/figures/block5_fig2_site_description.png)
+![The two complementary datasets at the five towers: WorldClim BIO1 (mean annual temperature), BIO12 (annual precipitation) and SoilGrids clay content 0–30 cm. Note the broken CN-HaM precipitation in the FLUXNET product (\~3 000 mm) vs. the WorldClim normal (468 mm) — see section E3.](../outputs/figures/block5_fig2_site_description.png)
 
 ## E3. Methods
 
-**Download.** All scripts were provided with the course and run unchanged with `--student 18`, which selects my five towers (AU-Dry, CA-Ca2, CN-HaM, FR-Hes, US-Bi1) from `tower_sets_block4.csv`. `02_worldclim.py` downloads the WorldClim 2.1 5′ base rasters (bioclimatic variables plus monthly temperature and precipitation normals) and samples them at the tower coordinates. `04_soilgrids.py` reads the SoilGrids 2.0 Cloud-Optimised GeoTIFFs directly from the ISRIC server via per-property VRTs and samples the pixel under each tower. `09_merge.py` reads the FLUXNET daily (`DD`) files from the local snapshot zip. One problem surfaced during the analysis (not during download): the FLUXNET precipitation at CN-HaM is unusable — see below.
+**Download.** All scripts were provided with the course and run unchanged with `--student 18`, which selects my five towers (AU-Dry, CA-Ca2, CN-HaM, FR-Hes, US-Bi1) from `tower_sets_block4.csv`. `02_worldclim.py` downloads the WorldClim 2.1 5′ base rasters (bioclimatic variables plus monthly temperature and precipitation normals) and samples them at the tower coordinates. `04_soilgrids.py` reads the SoilGrids 2.0 Cloud-Optimised GeoTIFFs directly from the ISRIC server via per-property VRTs and samples the pixel under each tower. `09_merge.py` reads the FLUXNET daily (`DD`) files from the local snapshot zip. The analysis itself is in `scripts/block5/10_anomaly_analysis.ipynb`, a notebook I wrote (the three download/merge scripts above are unchanged); it produces `data/processed/block5_anomalies.csv` and the two figures. One problem surfaced during the analysis (not during download): the FLUXNET precipitation at CN-HaM is unusable — see below.
 
 **Extraction.** WorldClim and SoilGrids are sampled at the single grid cell containing the tower coordinates (WGS 84 lat/lon; SoilGrids internally uses a custom equal-area CRS, handled by `pyproj` in the script). No window averaging was used — the assignment asks for the nearest cell, and the scale implications of that choice are discussed in E5.
 
-**Processing.** FLUXNET daily values with the fill value −9999 are treated as missing. Years are kept only if they have ≥ 300 daily records (all years passed) and start in 2001 or later (4 FR-Hes years from 1997–2000 dropped, because they overlap the 1970–2000 normal period). Annual `TA_mean` is the mean of daily `TA_F`; annual `P_sum` the sum of daily `P_F`. WorldClim BIO1/BIO12 are used directly (°C, mm). SoilGrids values are converted from integer maps by the script's d-factor (clay/sand in %, averaged over the 0–5, 5–15 and 15–30 cm depths to a 0–30 cm value). The three tables are joined on `site_id`.
+**Processing.** FLUXNET daily values with the fill value −9999 are treated as missing. A tower-year is kept only if it has ≥ 300 **non-missing** daily `TA_F` values and starts in 2001 or later. The first condition drops FR-Hes 2026, which has 365 rows but only 234 measured days (the record ends on 6 September 2026) — summing precipitation over that partial year would give a spurious −49 % anomaly. The second condition drops 5 tower-years that lie inside the 1970–2000 normal period itself (FR-Hes 1997–2000 and CA-Ca2 2000), because a year that is part of the normal is not an independent test of it. 75 tower-years remain. Annual `TA_mean` is the mean of daily `TA_F`; annual `P_sum` the sum of daily `P_F`. WorldClim BIO1/BIO12 are used directly (°C, mm). SoilGrids values are converted from integer maps by the script's d-factor (clay/sand in %, averaged over the 0–5, 5–15 and 15–30 cm depths to a 0–30 cm value). The three tables are joined on `site_id`.
 
-**Data-quality check on precipitation.** Before computing anomalies I checked whether `P_F` is measured or model-derived. **CN-HaM fails:** its `P_F` is identical to the ERA5-derived `P_ERA` on every day, `P_F_QC` is 0 everywhere (no measured contribution), and the resulting ~3 000 mm yr⁻¹ contradicts both the WorldClim normal (468 mm) and the published climate of the Haibei station on the north-eastern Tibetan Plateau (~500–600 mm yr⁻¹). The FLUXNET product's ERA5 precipitation for this site is broken, so CN-HaM is **excluded from the precipitation anomaly** (dP_pct = NA) but kept for the temperature anomaly (its `TA_F` is 95% measured and matches BIO1 well).
+**Data-quality check on precipitation.** Before computing anomalies I checked whether `P_F` is measured or model-derived. The check reads the raw FLUXNET daily files directly (the QC flags are not carried into `site_daily.csv`):
+
+```{python}
+#| echo: false
+import zipfile
+rows = []
+for zf in sorted(Path("data/raw").glob("*FLUXNET*.zip")):
+    with zipfile.ZipFile(zf) as z:
+        dd = [n for n in z.namelist() if "FLUXMET_DD" in n]
+        if not dd:
+            continue
+        raw = pd.read_csv(z.open(dd[0]), na_values=[-9999],
+                          usecols=lambda c: c in ("P_F", "P_ERA", "P_F_QC", "TA_F_QC"))
+    rows.append({"site_id": zf.name.split("_")[1],
+                 "P_F_QC": raw["P_F_QC"].mean(),
+                 "P_F == P_ERA": bool((raw["P_F"].fillna(-1) == raw["P_ERA"].fillna(-1)).all()),
+                 "P_F (mm/yr)": raw["P_F"].sum() / (len(raw) / 365.25),
+                 "TA_F_QC": raw["TA_F_QC"].mean()})
+qc = pd.DataFrame(rows).set_index("site_id").round(2)
+qc["BIO12"] = static["BIO12"]
+qc
+```
+
+**CN-HaM fails:** its `P_F` is identical to the ERA5-derived `P_ERA` on every day, `P_F_QC` is 0 everywhere (no measured contribution), and the resulting \~3 000 mm yr⁻¹ contradicts both the WorldClim normal (468 mm) and the published climate of the Haibei station on the north-eastern Tibetan Plateau (\~500–600 mm yr⁻¹). The FLUXNET product's ERA5 precipitation for this site is broken, so CN-HaM is **excluded from the precipitation anomaly** (dP_pct = NA) but kept for the temperature anomaly (its `TA_F` is 95% measured and matches BIO1 well).
 
 **Analysis.** For each tower-year *y* at tower *s*:
 
 $$dT_{s,y} = TA_{s,y} - BIO1_s \qquad dP_{s,y} = 100 \cdot \frac{P_{s,y} - BIO12_s}{BIO12_s}$$
 
-I report the mean dT, the fraction of tower-years warmer than normal, the fraction of tower-years drier than normal (over the 63 tower-years with usable precipitation), per-site means, and a descriptive correlation between mean dP_pct and SoilGrids clay/sand across the 4 towers with usable precipitation (n = 4 — descriptive only, no inference).
+I report the mean dT, the fraction of tower-years warmer than normal, the fraction of tower-years drier than normal (over the 61 tower-years with usable precipitation), per-site means, and — as a test of the second part of the hypothesis — the correlation between mean dP_pct and WorldClim BIO12 across the 4 towers with usable precipitation, plus a descriptive correlation with SoilGrids clay/sand (n = 4 — descriptive only, no inference).
 
 ## E4. Results
 
-Across **77 tower-years** (2001–2026, 5 towers), the mean temperature anomaly is **dT = +0.38 K**; **48 of 77 tower-years (62 %)** were warmer than the 1970–2000 normal. Of the **63 tower-years with usable precipitation** (CN-HaM excluded), **34 (54 %)** were drier than normal.
+Across **75 tower-years** (2001–2025, 5 towers), the mean temperature anomaly is **dT = +0.35 K**; **47 of 75 tower-years (63 %)** were warmer than the 1970–2000 normal. Of the **61 tower-years with usable precipitation** (CN-HaM excluded), **32 (52 %)** were drier than normal.
 
 ![Tower-year climate anomalies relative to the WorldClim 1970–2000 normals: temperature anomaly (K) vs. relative precipitation anomaly (%). Each point is one tower-year; colours are towers. CN-HaM has no precipitation anomaly (broken FLUXNET precipitation, see E3) and appears only on the temperature axis.](../outputs/figures/block5_fig1_anomaly_scatter.png)
 
@@ -83,17 +106,17 @@ site_anom = df.groupby("site_id")[["dP_pct", "dT"]].mean()
 site_anom.round(2)
 ```
 
-The warming signal is dominated by **FR-Hes** (+1.34 K, 25 of 26 years warmer) and **AU-Dry** (+0.37 K, 13 of 17 warmer); **CA-Ca2** (−0.11 K), **CN-HaM** (−0.32 K) and **US-Bi1** (−0.68 K) are on average slightly cooler than normal. For precipitation, **CA-Ca2** is strongly drier than normal (−28 %, all 11 years), while **FR-Hes** is wetter (+15 %) and AU-Dry and US-Bi1 are near normal (−2 %).
+The warming signal is dominated by **FR-Hes** (+1.24 K, 24 of 25 years warmer) and **AU-Dry** (+0.37 K, 13 of 17 warmer); **CA-Ca2** (−0.04 K), **CN-HaM** (−0.32 K) and **US-Bi1** (−0.68 K) are on average at or slightly below normal. For precipitation, **CA-Ca2** is strongly drier than normal (−28 %, all 10 years), while **FR-Hes** is wetter (+17 %) and AU-Dry and US-Bi1 are near normal (−2 % and −3 %).
 
-Second angle — do dry towers show larger relative precipitation anomalies? Across the 4 towers with usable precipitation, mean dP_pct correlates **positively with clay content (r = +0.82)** and weakly negatively with sand (r = −0.23). This is the **opposite** direction of the hypothesis: the driest tower in the set (US-Bi1, BIO12 = 396 mm) has a near-normal anomaly, while the wettest (CA-Ca2, 1 596 mm) is the driest relative to normal.
+Second angle — do dry towers show larger relative precipitation anomalies? Across the 4 towers with usable precipitation, mean dP_pct correlates **negatively with BIO12 (r = −0.71)**, i.e. in the direction the hypothesis predicts: the drier the tower's normal, the more negative its relative precipitation anomaly. But with n = 4 the relationship rests on a single point — the wettest tower, CA-Ca2 (BIO12 = 1 596 mm), is by far the driest relative to normal (−28 %), while the driest tower, US-Bi1 (396 mm), is near normal (−3 %). Removing CA-Ca2 leaves three towers with anomalies between −3 % and +17 % and no clear gradient. Mean dP_pct also correlates positively with SoilGrids clay (r = +0.79) and weakly negatively with sand (r = −0.25), which is the same pattern seen from the soil side (CA-Ca2 is both the wettest and the sandiest tower).
 
 ## E5. Discussion
 
-The hypothesis is **partially supported**. The warming part holds: tower-years are on average +0.38 K warmer than the 1970–2000 normals and 62 % of tower-years are warmer, which is what one expects given that the observation years (2001–2026) postdate the normal period. But it is carried almost entirely by FR-Hes and AU-Dry; the three other towers are slightly cooler than normal, so "warmer than normal" is not universal. The precipitation part is **not supported**: the driest tower does not have the largest relative anomaly, and the clay correlation goes the opposite way (r = +0.82). With n = 4 towers this correlation is descriptive anyway — one tower (CA-Ca2) largely determines it.
+The hypothesis is **partially supported**. The warming part holds: tower-years are on average +0.35 K warmer than the 1970–2000 normals and 63 % of tower-years are warmer, which is what one expects given that the observation years (2001–2025) postdate the normal period. But it is carried almost entirely by FR-Hes and AU-Dry; the three other towers are at or slightly below normal, so "warmer than normal" is not universal. The precipitation part is **weakly supported at best**: the sign of r(dP_pct, BIO12) = −0.71 is as predicted, but with n = 4 towers and one dominant outlier (CA-Ca2) this is descriptive, not a test. The honest reading is that the tower set is too small and too unevenly distributed along the precipitation gradient to separate a real dryness effect from site idiosyncrasies.
 
-**Scale.** WorldClim cells are 5′ ≈ 9 km across — one to two orders of magnitude larger than a flux footprint (100 m–1 km). In complex terrain (CN-HaM on the Tibetan Plateau edge, CA-Ca2 in coastal British Columbia) the 9 km cell can differ substantially from the tower's local climate, so part of the "anomaly" may be a scale mismatch rather than real interannual variability. SoilGrids at 250 m is much better matched to the footprint scale, so the soil comparison is the more defensible one — though the 0–30 cm clay/sand values are still a static map compared against multi-year flux-tower precipitation, a weak physical link.
+**Scale.** WorldClim cells are 5′ ≈ 9 km across — one to two orders of magnitude larger than a flux footprint (100 m–1 km). In complex terrain (CN-HaM on the Tibetan Plateau edge, CA-Ca2 in coastal British Columbia) the 9 km cell can differ substantially from the tower's local climate, so part of the "anomaly" may be a scale mismatch rather than real interannual variability. SoilGrids at 250 m is much better matched to the footprint scale, so the soil values themselves are the more trustworthy of the two predictors — but the link between a static 0–30 cm clay/sand map and multi-year precipitation is physically weak, so the soil correlation is a description of the tower set, not an explanation of the anomalies.
 
-**Limitations.** (1) The CN-HaM precipitation in the FLUXNET product is broken (fully ERA5-derived, ~3 000 mm yr⁻¹ vs. ~500–600 mm published), which cost one of five towers for the precipitation analysis and shows how sensitive the anomaly computation is to product quality control. (2) Confounding site effects: CA-Ca2 is a clearcut stand (harvested 1999/2000) whose local microclimate differs from the grid normal, and US-Bi1 is irrigated alfalfa, so its tower precipitation anomaly does not reflect water stress. With more time I would add more towers per climate zone to make the clay/sand comparison meaningful, and replace the broken ERA5-derived precipitation with a station or gauge-based product.
+**Limitations.** (1) The CN-HaM precipitation in the FLUXNET product is broken (fully ERA5-derived, \~3 000 mm yr⁻¹ vs. \~500–600 mm published), which cost one of five towers for the precipitation analysis and shows how sensitive the anomaly computation is to product quality control. (2) Confounding site effects: CA-Ca2 is a clearcut stand (harvested 1999/2000) whose local microclimate differs from the grid normal, and US-Bi1 is irrigated alfalfa, so its tower precipitation anomaly does not reflect water stress. With more time I would add more towers per climate zone so that the BIO12 and clay/sand comparisons rest on more than four points, and replace the broken ERA5-derived precipitation with a station or gauge-based product.
 
 ## E6. Data and citations
 
